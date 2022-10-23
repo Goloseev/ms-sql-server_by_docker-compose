@@ -1,6 +1,6 @@
 # ms-sql-server_by_docker-compose
 
-Для запуска контейнера в командной строке введите
+# Для запуска контейнера в командной строке введите
 
 git clone https://github.com/Goloseev/ms-sql-server_by_docker-compose.git
 cd ms-sql-server_by_docker-compose
