@@ -1,0 +1,4 @@
+# gitignore dc_msSQL_article
+
+_vol_msSQL/
+.env

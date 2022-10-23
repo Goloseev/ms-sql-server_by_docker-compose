@@ -1,0 +1,58 @@
+#docker-compose.yml
+
+version: "3.7"
+services:
+  sql2019server:
+    build:
+      context: ./src_msSQL
+      dockerfile: Dockerfile
+    #image: mcr.microsoft.com/mssql/server:2019-latest
+    image: ${COMPOSE_PROJECT_NAME:?err}-mssql-2019-latest
+    container_name: ${COMPOSE_PROJECT_NAME:?err}_container
+    restart: unless-stopped #always
+    #hostname: sql-server
+    
+    ports:
+      - "1433:1433"
+    
+    secrets:
+      - sa_password
+
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "MSSQL_USER=SA"
+     # - "SA_PASSWORD=MyPass123"
+      - "MSSQL_SA_PASSWORD_FILE=/run/secrets/sa_password"
+      - "MSSQL_PID=Express"
+      - "MSSQL_LCID=1049" # русский
+      - "MSSQL_COLLATION=1049"
+      - "MSSQL_MEMORY_LIMIT_MB=3500" #задает максимальный объем памяти (в МБ), который можно использовать SQL Server. По умолчанию он составляет 80% от общего объема физической памяти.
+      - "MSSQL_TCP_PORT=1433"
+#      - "MSSQL_IP_ADDRESS=0.0.0.0"
+#      - "MSSQL_BACKUP_DIR=/var/opt/mssql/backup" #Задайте расположение каталога резервного копирования по умолчанию.
+#      - "MSSQL_DATA_DIR=/var/opt/mssql/data" #Перейдите в каталог, где создаются новые базы данных файлы данных SQL Server (.mdf).
+#      - "MSSQL_LOG_DIR=/var/opt/mssql/log" #где создаются новые файлы журналов (LDF) базы данных SQL Server.
+      - "MSSQL_DUMP_DIR=/var/opt/mssql/dumps" #где SQL Server будет Депонировать дампы памяти и другие файлы для устранения неполадок по умолчанию.
+      - "MSSQL_ENABLE_HADR=0" #Включение группы доступности. Например "1" включена и отключена "0" - репликация
+#      - "MSSQL_AGENT_ENABLED=true" #Включите агент SQL Server. Например «true» включен, и «false» отключена. По умолчанию агент отключен.
+#      - "MSSQL_MASTER_DATA_FILE" #Задает расположение файла данных базы данных master.
+#      - "MSSQL_ERROR_LOG_FILE" #Задает расположение файла журнала базы данных master.
+#      - "MSSQL_MASTER_LOG_FILE" #Задает расположение файлов журнала ошибок.
+
+
+    deploy:
+      resources:
+        limits:    
+          memory: 4G
+          cpus: '2.0'
+
+    volumes:
+      - ./_vol_msSQL/data:/var/opt/mssql/data
+      - ./_vol_msSQL/log:/var/opt/mssql/log
+      - ./_vol_msSQL/secrets:/var/opt/mssql/secrets
+      - ./_vol_msSQL/backup:/var/opt/mssql/backup
+
+#глобальный раздел
+secrets:
+  sa_password:
+    file: ./sa_password.secret # Add this file in .gitignore to ignore from a repository
